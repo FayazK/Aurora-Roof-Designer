@@ -1,9 +1,9 @@
 import './App.css';
-import {Button, Layout} from "antd";
+import {Layout} from "antd";
 import Designer from "./Designer";
 
 
-const {Header, Content, Footer, Sider} = Layout;
+const {Header, Content} = Layout;
 
 function App() {
     return (<Layout>
@@ -15,7 +15,7 @@ function App() {
         >
             Header Toolbar
         </Header>
-        <Content>
+        <Content style={{height:'calc(100vh - 60px)'}}>
             <Designer />
         </Content>
     </Layout>);
