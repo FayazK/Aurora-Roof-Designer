@@ -1,17 +1,21 @@
-import React, {useRef, useState, useEffect} from 'react';
-import {useFrame, useThree} from '@react-three/fiber';
-import {Vector3} from 'three';
-import {useRecoilState} from "recoil";
-import {drawingAtom} from "../helpers/atom";
+import React, { useRef, useState, useEffect } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { Vector3 } from 'three';
+import { useRecoilState } from "recoil";
+import { drawingAtom, polygonsAtom } from "../helpers/atom";
+
+const isCloseToFirstVertex = (vertex, firstVertex) => {
+    const distance = new Vector3(...vertex).distanceTo(new Vector3(...firstVertex));
+    return distance < 0.5; // Adjust sensitivity as needed
+};
 
 export default function DynamicDrawing() {
-    const [vertices, setVertices] = useState([]);
+    const [polygons, setPolygons] = useRecoilState(polygonsAtom);
     const [tempVertex, setTempVertex] = useState(null);
-    const {pointer, camera, raycaster} = useThree();
-    const planeRef = useRef();
     const [isDrawing, setIsDrawing] = useRecoilState(drawingAtom);
+    const { pointer, camera, raycaster } = useThree();
+    const planeRef = useRef();
 
-    // Centralize event listener management
     const updateTempVertex = (event) => {
         raycaster.setFromCamera(pointer, camera);
         const intersects = raycaster.intersectObject(planeRef.current);
@@ -19,36 +23,40 @@ export default function DynamicDrawing() {
             const point = intersects[0].point;
             setTempVertex([point.x, point.y, point.z]);
         }
-    }
+    };
 
-    const addVertex = (event) => {
+    const finalizeVertex = () => {
         if (tempVertex) {
-            setVertices(v => [...v, tempVertex]);
-            setTempVertex(null); // Reset tempVertex after adding
+            if (polygons.length === 0 || !isDrawing) {
+                setPolygons([...polygons, [[...tempVertex]]]);
+                setIsDrawing(true); // Start drawing
+            } else {
+                const lastPolygon = polygons[polygons.length - 1];
+                if (isCloseToFirstVertex(tempVertex, lastPolygon[0])) {
+                    setIsDrawing(false); // Close polygon and stop drawing
+                    setTempVertex(null); // Clear temp vertex
+                } else {
+                    const newPolygons = [...polygons];
+                    newPolygons[newPolygons.length - 1] = [...lastPolygon, [...tempVertex]];
+                    setPolygons(newPolygons);
+                }
+            }
         }
     };
 
-    // Dedicated functions for managing listeners
-    const startDrawing = () => {
-        window.addEventListener('mousemove', updateTempVertex);
-        window.addEventListener('click', addVertex);
-    }
-
-    const stopDrawing = () => {
-        window.removeEventListener('mousemove', updateTempVertex);
-        window.removeEventListener('click', addVertex);
-    }
-
     useEffect(() => {
+        window.addEventListener('mousemove', updateTempVertex);
         if (isDrawing) {
-            startDrawing();
+            window.addEventListener('click', finalizeVertex);
         } else {
-            stopDrawing();
+            window.removeEventListener('click', finalizeVertex);
         }
 
-        // Cleanup function to ensure no listeners are left behind
-        return stopDrawing;
-    }, [isDrawing, tempVertex]); // Simplified dependency array
+        return () => {
+            window.removeEventListener('mousemove', updateTempVertex);
+            window.removeEventListener('click', finalizeVertex);
+        };
+    }, [isDrawing, tempVertex, polygons]);
 
     return (<>
         <mesh
@@ -58,11 +66,14 @@ export default function DynamicDrawing() {
             <planeGeometry args={[100, 100]}/>
             <meshStandardMaterial color="lightblue" opacity={0.5} transparent/>
         </mesh>
-        {vertices.length > 0 && <DynamicPolygon vertices={vertices} tempVertex={tempVertex}/>}
+        {polygons.map((vertices, index) => (
+            <DynamicPolygon key={index} vertices={vertices} tempVertex={isDrawing && tempVertex} />
+        ))}
     </>);
 }
 
-function DynamicPolygon({vertices, tempVertex}) {
+
+function DynamicPolygon({ vertices, tempVertex }) {
     const lineRef = useRef();
 
     useFrame(() => {
@@ -75,8 +86,10 @@ function DynamicPolygon({vertices, tempVertex}) {
         }
     });
 
-    return (<line ref={lineRef}>
-        <bufferGeometry attach="geometry"/>
-        <lineBasicMaterial color="red"/>
-    </line>);
+    return (
+        <line ref={lineRef}>
+            <bufferGeometry attach="geometry" />
+            <lineBasicMaterial color="red" />
+        </line>
+    );
 }

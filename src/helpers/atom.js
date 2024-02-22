@@ -4,6 +4,6 @@ export const drawingAtom = atom({
     default: false, key: 'drawingAtom'
 })
 
-export const polygonAtom = atom({
+export const polygonsAtom = atom({
     default: [], key: 'polygonAtom'
 });
