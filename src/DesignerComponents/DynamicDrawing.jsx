@@ -1,13 +1,13 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {useFrame, useThree} from '@react-three/fiber';
-import { Vector3 } from 'three';
-import { useRecoilState } from "recoil";
-import { drawingAtom } from "../helpers/atom";
+import {Vector3} from 'three';
+import {useRecoilState} from "recoil";
+import {drawingAtom} from "../helpers/atom";
 
 export default function DynamicDrawing() {
     const [vertices, setVertices] = useState([]);
     const [tempVertex, setTempVertex] = useState(null);
-    const { pointer, camera, raycaster } = useThree();
+    const {pointer, camera, raycaster} = useThree();
     const planeRef = useRef();
     const [isDrawing, setIsDrawing] = useRecoilState(drawingAtom);
 
@@ -48,7 +48,7 @@ export default function DynamicDrawing() {
 
         // Cleanup function to ensure no listeners are left behind
         return stopDrawing;
-    }, [isDrawing,tempVertex]); // Simplified dependency array
+    }, [isDrawing, tempVertex]); // Simplified dependency array
 
     return (<>
         <mesh

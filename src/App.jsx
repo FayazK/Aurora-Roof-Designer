@@ -3,7 +3,6 @@ import {Button, Layout, theme} from "antd";
 import Designer from "./Designer";
 import {useRecoilState} from "recoil";
 import {drawingAtom} from "./helpers/atom";
-import {useCallback} from "react";
 
 
 const {Header, Content} = Layout;
