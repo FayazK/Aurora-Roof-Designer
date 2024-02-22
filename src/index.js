@@ -4,12 +4,15 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {ConfigProvider} from "antd";
+import {RecoilRoot} from "recoil";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ConfigProvider>
-        <App />
+        <RecoilRoot>
+            <App />
+        </RecoilRoot>
     </ConfigProvider>
   </React.StrictMode>
 );
