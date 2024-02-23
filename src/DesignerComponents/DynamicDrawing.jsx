@@ -1,8 +1,7 @@
-import React, {useRef, useState, useEffect} from 'react';
+import React, {useRef, useState, useEffect, useCallback} from 'react';
 import {useThree} from '@react-three/fiber';
 import {useRecoilState} from "recoil";
 import {drawingAtom, polygonsAtom} from "../helpers/atom";
-import {dd} from "../helpers/logger";
 import {DynamicPolygon, isCloseToFirstVertex} from "../3dComponents/DynamicPolygon";
 
 export default function DynamicDrawing() {
@@ -10,74 +9,66 @@ export default function DynamicDrawing() {
     const [tempPoly, setTempPoly] = useState([]);
     const [tempVertex, setTempVertex] = useState([]);
     const [isDrawing, setIsDrawing] = useRecoilState(drawingAtom);
-    const {pointer, camera, raycaster} = useThree();
+    const {pointer, camera, raycaster, gl} = useThree();
     const planeRef = useRef();
 
-    const updateTempVertex = () => {
+    const updateTempVertex = useCallback(() => {
         raycaster.setFromCamera(pointer, camera);
         const intersects = raycaster.intersectObject(planeRef.current);
         if (intersects.length > 0) {
             const point = intersects[0].point;
             setTempVertex([point.x, point.y, point.z]);
         }
-    }// updateTempVertex
+    }, [pointer, camera, raycaster]);// updateTempVertex
 
-    const commitPolygon = () => {
+    const commitPolygon = useCallback(() => {
         if (tempPoly.length > 0) {
             setPolygons(p => [...p, tempPoly]);
             setTempVertex([]);
             setTempPoly([]);
         }
-    }// commitPolygon
+    }, [tempPoly, setPolygons]);// commitPolygon
 
-    const finalizeVertex = () => {
-        if (tempVertex && tempVertex.length === 3) {
-            if (!tempPoly.length) {
-                setTempPoly([tempVertex]);
-                return;
-            }
-            setTempPoly([...tempPoly, tempVertex]);
-            // Add tempVertex to the current polygon
-            if (isCloseToFirstVertex(tempVertex, tempPoly[0]) && tempPoly.length > 2) {
-                setIsDrawing(false);
-            }
+    const finalizeVertex = useCallback(() => {
+        // Logic that doesn't directly update state but decides if an update is needed
+        const shouldFinalize = tempVertex && tempVertex.length === 3;
+        const shouldClosePolygon = shouldFinalize && isCloseToFirstVertex(tempVertex, tempPoly[0]) && tempPoly.length > 2;
+
+        if (shouldFinalize) {
+            setTempPoly(prevTempPoly => [...prevTempPoly, shouldClosePolygon ? prevTempPoly[0] : tempVertex]);
         }
-    }// finalizeVertex
 
-    const attachEvents = () => {
-        window.addEventListener('mousemove', updateTempVertex);
-        window.addEventListener('click', finalizeVertex);
-    }// attachEvents
+        if (shouldClosePolygon) {
+            // Deferring the setIsDrawing update to avoid warning
+            setTimeout(() => setIsDrawing(false), 0);
+        }
+    }, [tempVertex, tempPoly, setIsDrawing]);
 
-    const removeEvents = () => {
-        window.removeEventListener('mousemove', updateTempVertex);
-        window.removeEventListener('click', finalizeVertex);
-    }// removeEvents
 
     useEffect(() => {
+        const canvas = gl.domElement;
+
         if (isDrawing) {
-            attachEvents()
+            canvas.addEventListener('mousemove', updateTempVertex);
+            canvas.addEventListener('click', finalizeVertex);
         } else {
-            removeEvents()
             commitPolygon();
         }
 
         return () => {
-            removeEvents();
-        }
-    }, [isDrawing, tempVertex, tempPoly]);
+            canvas.removeEventListener('mousemove', updateTempVertex);
+            canvas.removeEventListener('click', finalizeVertex);
+        };
+    }, [isDrawing, updateTempVertex, finalizeVertex, commitPolygon, gl.domElement]);
+
 
     return (<>
-        <mesh
-            ref={planeRef}
-            position={[0, 0, 0]}
-        >
+        <mesh ref={planeRef} position={[0, 0, 0]}>
             <planeGeometry args={[100, 100]}/>
             <meshStandardMaterial color="black"/>
         </mesh>
-        {polygons.map((vertices, index) => {
-            return <DynamicPolygon key={index} vertices={vertices} tempVertex={isDrawing && tempVertex}/>
-        })}
+        {polygons.map((vertices, index) => (
+            <DynamicPolygon key={index} vertices={vertices} tempVertex={isDrawing && tempVertex}/>))}
         {(isDrawing && tempPoly.length) && <DynamicPolygon vertices={tempPoly} tempVertex={tempVertex}/>}
     </>);
 }// DynamicDrawing
