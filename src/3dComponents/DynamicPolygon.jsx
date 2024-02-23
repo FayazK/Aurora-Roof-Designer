@@ -1,7 +1,8 @@
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Vector3 } from "three";
 import { dd } from "../helpers/logger";
+import {now} from "three/examples/jsm/libs/tween.module";
 
 export function DynamicPolygon({ vertices, tempVertex }) {
     const lineRef = useRef();

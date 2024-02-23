@@ -3,6 +3,7 @@ import {useThree} from '@react-three/fiber';
 import {useRecoilState} from "recoil";
 import {drawingAtom, polygonsAtom} from "../helpers/atom";
 import {DynamicPolygon, isCloseToFirstVertex} from "../3dComponents/DynamicPolygon";
+import {dd} from "../helpers/logger";
 
 export default function DynamicDrawing() {
     const [polygons, setPolygons] = useRecoilState(polygonsAtom);
@@ -61,14 +62,21 @@ export default function DynamicDrawing() {
         };
     }, [isDrawing, updateTempVertex, finalizeVertex, commitPolygon, gl.domElement]);
 
+    // Effect to reset tempPoly and tempVertex when starting a new drawing
+    useEffect(() => {
+        if (!isDrawing) {
+            setTempPoly([]);
+            setTempVertex([]);
+        }
+    }, [isDrawing]);
+
 
     return (<>
         <mesh ref={planeRef} position={[0, 0, 0]}>
             <planeGeometry args={[100, 100]}/>
             <meshStandardMaterial color="black"/>
         </mesh>
-        {polygons.map((vertices, index) => (
-            <DynamicPolygon key={index} vertices={vertices} tempVertex={isDrawing && tempVertex}/>))}
+        {polygons.map((vertices, index) => (<DynamicPolygon key={index} vertices={vertices}/>))}
         {(isDrawing && tempPoly.length) && <DynamicPolygon vertices={tempPoly} tempVertex={tempVertex}/>}
     </>);
 }// DynamicDrawing
