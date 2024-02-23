@@ -74,7 +74,7 @@ export default function DynamicDrawing() {
             position={[0, 0, 0]}
         >
             <planeGeometry args={[100, 100]}/>
-            <meshStandardMaterial color="lightblue" opacity={0.5} transparent/>
+            <meshStandardMaterial color="black"/>
         </mesh>
         {polygons.map((vertices, index) => {
             return <DynamicPolygon key={index} vertices={vertices} tempVertex={isDrawing && tempVertex}/>
