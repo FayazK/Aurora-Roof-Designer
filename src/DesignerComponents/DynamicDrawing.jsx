@@ -1,72 +1,71 @@
 import React, {useRef, useState, useEffect} from 'react';
-import {useFrame, useThree} from '@react-three/fiber';
-import {Vector3} from 'three';
+import {useThree} from '@react-three/fiber';
 import {useRecoilState} from "recoil";
 import {drawingAtom, polygonsAtom} from "../helpers/atom";
-
-const isCloseToFirstVertex = (vertex, firstVertex) => {
-    console.log(vertex, firstVertex)
-    if(!Array.isArray(vertex) || !Array.isArray(firstVertex)) {
-        return false;
-    }
-    const distance = new Vector3(...vertex).distanceTo(new Vector3(...firstVertex));
-    return distance < 0.5; // Adjust sensitivity as needed
-};
+import {dd} from "../helpers/logger";
+import {DynamicPolygon, isCloseToFirstVertex} from "../3dComponents/DynamicPolygon";
 
 export default function DynamicDrawing() {
     const [polygons, setPolygons] = useRecoilState(polygonsAtom);
+    const [tempPoly, setTempPoly] = useState([]);
     const [tempVertex, setTempVertex] = useState([]);
     const [isDrawing, setIsDrawing] = useRecoilState(drawingAtom);
     const {pointer, camera, raycaster} = useThree();
     const planeRef = useRef();
 
-    // Adjusted to handle polygon closure and new drawing initiation
-    const updateTempVertex = (event) => {
+    const updateTempVertex = () => {
         raycaster.setFromCamera(pointer, camera);
         const intersects = raycaster.intersectObject(planeRef.current);
         if (intersects.length > 0) {
             const point = intersects[0].point;
             setTempVertex([point.x, point.y, point.z]);
         }
-    };
+    }// updateTempVertex
+
+    const commitPolygon = () => {
+        if (tempPoly.length > 0) {
+            setPolygons(p => [...p, tempPoly]);
+            setTempVertex([]);
+            setTempPoly([]);
+        }
+    }// commitPolygon
 
     const finalizeVertex = () => {
-        // Ensure tempVertex is a complete vertex before attempting to add it
-        if (tempVertex && Array.isArray(tempVertex) && tempVertex.length === 3) {
-            if (polygons.length === 0 || !isDrawing) {
-                // Start a new polygon with tempVertex as the first vertex
-                setPolygons([[tempVertex]]);
-                setIsDrawing(true);
-            } else {
-                // Add tempVertex to the current polygon
-                const lastPolygon = polygons[polygons.length - 1];
-                if (isCloseToFirstVertex(tempVertex, lastPolygon[0]) && lastPolygon.length > 2) {
-                    // Close the polygon and stop drawing
-                    setPolygons(p => [...p.slice(0, -1), [...lastPolygon, lastPolygon[0]]]);
-                    setIsDrawing(false);
-                    setTempVertex([]);
-                } else {
-                    // Add the new vertex to the current polygon
-                    setPolygons(p => [...p.slice(0, -1), [...lastPolygon, tempVertex]]);
-                }
+        if (tempVertex && tempVertex.length === 3) {
+            if (!tempPoly.length) {
+                setTempPoly([tempVertex]);
+                return;
+            }
+            setTempPoly([...tempPoly, tempVertex]);
+            // Add tempVertex to the current polygon
+            if (isCloseToFirstVertex(tempVertex, tempPoly[0]) && tempPoly.length > 2) {
+                setIsDrawing(false);
             }
         }
-    };// finalizeVertex
+    }// finalizeVertex
+
+    const attachEvents = () => {
+        window.addEventListener('mousemove', updateTempVertex);
+        window.addEventListener('click', finalizeVertex);
+    }// attachEvents
+
+    const removeEvents = () => {
+        window.removeEventListener('mousemove', updateTempVertex);
+        window.removeEventListener('click', finalizeVertex);
+    }// removeEvents
 
     useEffect(() => {
         if (isDrawing) {
-            window.addEventListener('mousemove', updateTempVertex);
-            window.addEventListener('click', finalizeVertex);
+            attachEvents()
         } else {
-            window.removeEventListener('mousemove', updateTempVertex);
-            window.removeEventListener('click', finalizeVertex);
+            removeEvents()
+            commitPolygon();
         }
 
         return () => {
-            window.removeEventListener('mousemove', updateTempVertex);
-            window.removeEventListener('click', finalizeVertex);
-        };
-    }, [isDrawing, tempVertex]);
+            removeEvents();
+        }
+    }, [isDrawing, tempVertex, tempPoly]);
 
     return (<>
         <mesh
@@ -79,33 +78,6 @@ export default function DynamicDrawing() {
         {polygons.map((vertices, index) => {
             return <DynamicPolygon key={index} vertices={vertices} tempVertex={isDrawing && tempVertex}/>
         })}
+        {(isDrawing && tempPoly.length) && <DynamicPolygon vertices={tempPoly} tempVertex={tempVertex}/>}
     </>);
-}
-
-
-function DynamicPolygon({vertices, tempVertex}) {
-    const lineRef = useRef();
-
-    useFrame(() => {
-        if (lineRef.current) {
-            const points = (Array.isArray(vertices) ? vertices : []).map(v => {
-                if (Array.isArray(v)) {
-                    return new Vector3(...v)
-                }
-                return []
-            });
-            // Only push tempVertex if it's a valid array of numbers
-            if (tempVertex && Array.isArray(tempVertex) && tempVertex.length === 3) {
-                points.push(new Vector3(...tempVertex));
-            }
-            lineRef.current.geometry.setFromPoints(points);
-        }
-    });
-
-    return (<line ref={lineRef}>
-        <bufferGeometry attach="geometry"/>
-        <lineBasicMaterial color="red"/>
-    </line>);
-}
-
-
+}// DynamicDrawing
