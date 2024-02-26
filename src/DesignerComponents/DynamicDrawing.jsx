@@ -114,7 +114,6 @@ export default function DynamicDrawing() {
         }
     }, [isDrawing]);
 
-
     return (<>
         <mesh ref={planeRef} position={[0, 0, 0]}>
             <planeGeometry args={[100, 100]}/>
