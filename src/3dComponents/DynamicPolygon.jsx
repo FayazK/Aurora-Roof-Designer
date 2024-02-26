@@ -1,15 +1,13 @@
-import { useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
-import { Vector3 } from "three";
+import {useRef, useMemo} from "react";
+import {useFrame} from "@react-three/fiber";
+import {Vector3} from "three";
 
-export function DynamicPolygon({ vertices, tempVertex }) {
+export function DynamicPolygon({vertices, tempVertex}) {
     const lineRef = useRef();
 
     // Memoize points transformation
     const points = useMemo(() => {
-        const transformedVertices = (Array.isArray(vertices) ? vertices : []).map(v =>
-            Array.isArray(v) ? new Vector3(...v) : null
-        ).filter(v => v !== null); // Filter out invalid vertices
+        const transformedVertices = (Array.isArray(vertices) ? vertices : []).map(v => Array.isArray(v) ? new Vector3(...v) : null).filter(v => v !== null); // Filter out invalid vertices
 
         // Only push tempVertex if it's a valid array of numbers
         if (tempVertex && Array.isArray(tempVertex) && tempVertex.length === 3) {
@@ -25,10 +23,23 @@ export function DynamicPolygon({ vertices, tempVertex }) {
         }
     }, [points]); // Depend on points to reduce unnecessary updates
 
-    return (<line ref={lineRef}>
-        <bufferGeometry attach="geometry" />
-        <lineBasicMaterial color="red" />
-    </line>);
+    return (<group>
+        <line ref={lineRef}>
+            <bufferGeometry attach="geometry"/>
+            <lineBasicMaterial color="red"/>
+        </line>
+        {vertices.map((vertex, idx) => (<mesh
+            key={idx}
+            position={new Vector3(...vertex)}
+        >
+            <sphereGeometry args={[0.03, 32, 32]}/>
+            <meshBasicMaterial color="white"/>
+        </mesh>))}
+        {tempVertex && (<mesh position={new Vector3(...tempVertex)}>
+            <sphereGeometry args={[0.03, 32, 32]}/>
+            <meshBasicMaterial color="white"/>
+        </mesh>)}
+    </group>);
 }
 
 export const isCloseToFirstVertex = (vertex, firstVertex) => {
