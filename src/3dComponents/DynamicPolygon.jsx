@@ -1,9 +1,13 @@
 import {useRef, useMemo} from "react";
 import {useFrame} from "@react-three/fiber";
 import {Vector3} from "three";
+import {useRecoilValue, useSetRecoilState} from "recoil";
+import {currentVertexAtom, drawingAtom} from "../helpers/atom";
 
-export function DynamicPolygon({vertices, tempVertex}) {
+export function DynamicPolygon({vertices, tempVertex, polygonIndex}) {
     const lineRef = useRef();
+    const isDrawing = useRecoilValue(drawingAtom)
+    const setCurrentVertex = useSetRecoilState(currentVertexAtom)
 
     // Memoize points transformation
     const points = useMemo(() => {
@@ -21,7 +25,13 @@ export function DynamicPolygon({vertices, tempVertex}) {
         if (lineRef.current) {
             lineRef.current.geometry.setFromPoints(points);
         }
-    }, [points]); // Depend on points to reduce unnecessary updates
+    }, [points])
+
+    const handleVertexClick = (polygonIndex, vertex, index) => {
+        if (!isDrawing) {
+            setCurrentVertex({polygonIndex: polygonIndex, vertexIndex: index, vertex: vertex});
+        }
+    }
 
     return (<group>
         <line ref={lineRef}>
@@ -31,6 +41,7 @@ export function DynamicPolygon({vertices, tempVertex}) {
         {vertices.map((vertex, idx) => (<mesh
             key={idx}
             position={new Vector3(...vertex)}
+            onClick={() => handleVertexClick(polygonIndex, vertex, idx)}
         >
             <sphereGeometry args={[0.03, 32, 32]}/>
             <meshBasicMaterial color="white"/>
@@ -48,4 +59,4 @@ export const isCloseToFirstVertex = (vertex, firstVertex) => {
     }
     const distance = new Vector3(...vertex).distanceToSquared(new Vector3(...firstVertex));
     return distance < 0.25; // Use distanceToSquared to avoid the sqrt calculation, adjust sensitivity as needed
-};
+}

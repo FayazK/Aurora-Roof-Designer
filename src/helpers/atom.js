@@ -7,3 +7,7 @@ export const drawingAtom = atom({
 export const polygonsAtom = atom({
     default: [], key: 'polygonAtom'
 });
+
+export const currentVertexAtom = atom({
+    default: null, key: 'currentVertexAtom'
+});
