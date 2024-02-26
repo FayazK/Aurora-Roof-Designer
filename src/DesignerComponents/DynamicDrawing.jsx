@@ -3,7 +3,6 @@ import {useThree} from '@react-three/fiber';
 import {useRecoilState} from "recoil";
 import {drawingAtom, polygonsAtom} from "../helpers/atom";
 import {DynamicPolygon, isCloseToFirstVertex} from "../3dComponents/DynamicPolygon";
-import {dd} from "../helpers/logger";
 
 export default function DynamicDrawing() {
     const [polygons, setPolygons] = useRecoilState(polygonsAtom);
