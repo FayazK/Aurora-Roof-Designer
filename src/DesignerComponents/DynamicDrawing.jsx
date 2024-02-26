@@ -68,7 +68,15 @@ export default function DynamicDrawing() {
 
     const commitPolygon = useCallback(() => {
         if (tempPoly.length > 0) {
-            setPolygons(p => [...p, tempPoly]);
+            // Check if the last vertex is a duplicate of the first vertex
+            const isDuplicate = tempPoly[0].x === tempPoly[tempPoly.length - 1].x &&
+                tempPoly[0].y === tempPoly[tempPoly.length - 1].y &&
+                tempPoly[0].z === tempPoly[tempPoly.length - 1].z;
+
+            // If it's a duplicate, remove the last vertex before adding to polygons
+            const newPoly = isDuplicate ? tempPoly.slice(0, -1) : tempPoly;
+
+            setPolygons(p => [...p, newPoly]);
             setTempVertex([]);
             setTempPoly([]);
         }
