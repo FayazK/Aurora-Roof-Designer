@@ -16,11 +16,7 @@ function App() {
     }
 
     return (<Layout>
-        <Header
-            style={{
-                height: '60px', display: 'flex', alignItems: 'center', backgroundColor: colorBgContainer
-            }}
-        >
+        <Header className={'header'} style={{backgroundColor:colorBgContainer}}>
             <Button onClick={handleDrawing}>{isDrawing ? 'Stop Drawing' : 'Start Drawing'}</Button>
         </Header>
         <Content style={{height: 'calc(100vh - 60px)'}}>
