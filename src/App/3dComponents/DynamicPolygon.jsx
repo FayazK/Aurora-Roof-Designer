@@ -77,5 +77,5 @@ export const isCloseToFirstVertex = (vertex, firstVertex) => {
         return false;
     }
     const distance = new Vector3(...vertex).distanceToSquared(new Vector3(...firstVertex));
-    return distance < 0.25; // Use distanceToSquared to avoid the sqrt calculation, adjust sensitivity as needed
+    return distance < 0.1; // Use distanceToSquared to avoid the sqrt calculation, adjust sensitivity as needed
 }
