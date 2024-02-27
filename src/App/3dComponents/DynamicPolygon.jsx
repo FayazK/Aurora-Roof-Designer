@@ -1,11 +1,12 @@
 import {useRef, useMemo} from "react";
 import {useFrame} from "@react-three/fiber";
 import {Vector3} from "three";
-import { Text } from "@react-three/drei";
+import {Text} from "@react-three/drei";
 
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {currentVertexAtom, drawingAtom} from "../../helpers/atom";
 import {calculateDistance} from "../../helpers/Formulas";
+import {useDrag} from "react-use-gesture";
 
 export const DynamicPolygon = ({vertices, tempVertex, polygonIndex}) => {
     const lineRef = useRef();
@@ -35,11 +36,20 @@ export const DynamicPolygon = ({vertices, tempVertex, polygonIndex}) => {
         }
     }, [points])
 
-    const handleVertexClick = (polygonIndex, vertex, index) => {
-        if (!isDrawing) {
-            setCurrentVertex({polygonIndex: polygonIndex, vertexIndex: index, vertex: vertex});
+    const bind = useDrag((props) => {
+        if (!props.down || isDrawing) {
+            setCurrentVertex(null);
+            return;
         }
-    }
+        const data = {
+            polygonIndex,
+            vertex: props.args[0],
+            vertexIndex: props.args[1],
+            x: props.event.clientX,
+            y: props.event.clientY
+        }
+        setCurrentVertex(data);
+    });
 
     return (<group>
         <line ref={lineRef}>
@@ -55,7 +65,7 @@ export const DynamicPolygon = ({vertices, tempVertex, polygonIndex}) => {
                 <mesh
                     key={idx}
                     position={new Vector3(...vertex)}
-                    onClick={() => handleVertexClick(polygonIndex, vertex, idx)}
+                    {...bind(vertex, idx)}
                 >
                     <sphereGeometry args={[0.03, 32, 32]}/>
                     <meshBasicMaterial color="white"/>

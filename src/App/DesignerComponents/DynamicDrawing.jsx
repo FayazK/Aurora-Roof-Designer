@@ -2,9 +2,10 @@ import React, {useRef, useState, useEffect, useCallback} from 'react';
 import {useThree} from '@react-three/fiber';
 import {useRecoilState} from "recoil";
 import {currentVertexAtom, drawingAtom, polygonsAtom} from "../../helpers/atom";
-import {DynamicPolygon, isCloseToFirstVertex} from "../3dComponents/DynamicPolygon";
+import {DynamicPolygon} from "../3dComponents/DynamicPolygon";
 import {produce} from "immer";
 import {throttle} from "lodash/function";
+import {isCloseToFirstVertex} from "./CanvasComponents";
 
 export default function DynamicDrawing() {
     const [polygons, setPolygons] = useRecoilState(polygonsAtom);
@@ -16,52 +17,38 @@ export default function DynamicDrawing() {
     const planeRef = useRef();
 
     useEffect(() => {
-        const handleMouseMove = throttle((event) => {
-            if (!selectedVertex) return; // Early return to avoid unnecessary computations
+        if (!selectedVertex) {
+            return;
+        }
+        const {polygonIndex, vertexIndex, x, y} = selectedVertex;
+        // Calculate mouse position in normalized device coordinates (-1 to +1) for both components
+        const canvasX = (x / window.innerWidth) * 2 - 1;
+        const canvasY = -(y / (window.innerHeight+40)) * 2+1;
 
-            // Calculate mouse position in normalized device coordinates (-1 to +1) for both components
-            const x = (event.clientX / window.innerWidth) * 2 - 1;
-            const y = -(event.clientY / window.innerHeight) * 2 + 1;
+        // Update only if necessary to minimize setting values
+        if (pointer.x !== canvasX || pointer.y !== canvasY) {
+            pointer.x = canvasX;
+            pointer.y = canvasY;
 
-            // Update only if necessary to minimize setting values
-            if (pointer.x !== x || pointer.y !== y) {
-                pointer.x = x;
-                pointer.y = y;
+            // Update the picking ray with the camera and mouse position
+            raycaster.setFromCamera(pointer, camera);
 
-                // Update the picking ray with the camera and mouse position
-                raycaster.setFromCamera(pointer, camera);
+            // Calculate objects intersecting the picking ray
+            const intersects = raycaster.intersectObject(planeRef.current);
 
-                // Calculate objects intersecting the picking ray
-                const intersects = raycaster.intersectObject(planeRef.current);
+            if (intersects.length > 0) {
+                // The first intersection point is the new position in world coordinates
+                const point = intersects[0].point;
 
-                if (intersects.length > 0) {
-                    // The first intersection point is the new position in world coordinates
-                    const point = intersects[0].point;
-
-                    setPolygons(currentPolygons => produce(currentPolygons, draft => {
-                        draft[selectedVertex.polygonIndex][selectedVertex.vertexIndex] = point.toArray();
-                    }));
-                }
+                setPolygons(currentPolygons => produce(currentPolygons, draft => {
+                    draft[polygonIndex][vertexIndex] = point.toArray();
+                }));
             }
-        }, 10)
-
-        window.addEventListener('mousemove', handleMouseMove);
-
+        }
         return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-        };
-    }, [selectedVertex, camera, pointer, raycaster, setPolygons]);
-
-    useEffect(() => {
-        const handleMouseUp = () => {
             setSelectedVertex(null);
-        };
-
-        window.addEventListener('mouseup', handleMouseUp);
-        return () => {
-            window.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, [setSelectedVertex]);
+        }
+    }, [selectedVertex]);
 
     const updateTempVertex = useCallback(() => {
         raycaster.setFromCamera(pointer, camera);
@@ -127,7 +114,9 @@ export default function DynamicDrawing() {
             <planeGeometry args={[100, 100]}/>
             <meshStandardMaterial color="black"/>
         </mesh>
-        {polygons.map((vertices, index) => (<DynamicPolygon key={index} polygonIndex={index} vertices={vertices}/>))}
-        {(isDrawing && tempPoly.length) && <DynamicPolygon vertices={tempPoly} tempVertex={tempVertex}/>}
+        {polygons.map((vertices, index) => (
+            <DynamicPolygon key={'poly-'.index} polygonIndex={index} vertices={vertices}/>))}
+        {(isDrawing && tempPoly.length) &&
+            <DynamicPolygon vertices={tempPoly} tempVertex={tempVertex} key={`tmp-vertex`}/>}
     </>);
 }// DynamicDrawing
