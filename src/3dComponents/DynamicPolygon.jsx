@@ -18,8 +18,13 @@ export function DynamicPolygon({vertices, tempVertex, polygonIndex}) {
             transformedVertices.push(new Vector3(...tempVertex));
         }
 
+        // Close the loop if not drawing, to connect the last and the first vertex
+        if (!isDrawing && transformedVertices.length > 0) {
+            transformedVertices.push(transformedVertices[0]);
+        }
+
         return transformedVertices;
-    }, [vertices, tempVertex]); // Depend on vertices and tempVertex
+    }, [vertices, tempVertex, isDrawing]); // Depend on vertices and tempVertex
 
     useFrame(() => {
         if (lineRef.current) {

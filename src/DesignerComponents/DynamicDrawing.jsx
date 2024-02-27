@@ -79,8 +79,8 @@ export default function DynamicDrawing() {
         const shouldFinalize = tempVertex && tempVertex.length === 3;
         const shouldClosePolygon = shouldFinalize && isCloseToFirstVertex(tempVertex, tempPoly[0]) && tempPoly.length > 2;
 
-        if (shouldFinalize) {
-            setTempPoly(prevTempPoly => [...prevTempPoly, shouldClosePolygon ? prevTempPoly[0] : tempVertex]);
+        if (shouldFinalize && !shouldClosePolygon) {
+            setTempPoly(prevTempPoly => [...prevTempPoly, tempVertex]);
         }
 
         if (shouldClosePolygon) {
