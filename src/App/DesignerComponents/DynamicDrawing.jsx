@@ -1,7 +1,7 @@
 import React, {useRef, useState, useEffect, useCallback} from 'react';
 import {useThree} from '@react-three/fiber';
 import {useRecoilState} from "recoil";
-import {currentVertexAtom, drawingAtom, polygonsAtom} from "../helpers/atom";
+import {currentVertexAtom, drawingAtom, polygonsAtom} from "../../helpers/atom";
 import {DynamicPolygon, isCloseToFirstVertex} from "../3dComponents/DynamicPolygon";
 
 export default function DynamicDrawing() {

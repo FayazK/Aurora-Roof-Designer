@@ -2,7 +2,7 @@ import {useRef, useMemo} from "react";
 import {useFrame} from "@react-three/fiber";
 import {Vector3} from "three";
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {currentVertexAtom, drawingAtom} from "../helpers/atom";
+import {currentVertexAtom, drawingAtom} from "../../helpers/atom";
 
 export function DynamicPolygon({vertices, tempVertex, polygonIndex}) {
     const lineRef = useRef();

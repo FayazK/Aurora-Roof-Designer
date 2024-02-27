@@ -1,8 +1,8 @@
-import './App.css';
+import '../assets/css/App.css';
 import {Button, Layout, theme} from "antd";
 import Designer from "./Designer";
 import {useRecoilState} from "recoil";
-import {drawingAtom} from "./helpers/atom";
+import {drawingAtom} from "../helpers/atom";
 
 
 const {Header, Content} = Layout;
