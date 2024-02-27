@@ -4,7 +4,7 @@ import {Vector3} from "three";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {currentVertexAtom, drawingAtom} from "../../helpers/atom";
 
-export function DynamicPolygon({vertices, tempVertex, polygonIndex}) {
+export const DynamicPolygon = ({vertices, tempVertex, polygonIndex}) => {
     const lineRef = useRef();
     const isDrawing = useRecoilValue(drawingAtom)
     const setCurrentVertex = useSetRecoilState(currentVertexAtom)

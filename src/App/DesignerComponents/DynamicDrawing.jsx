@@ -3,6 +3,8 @@ import {useThree} from '@react-three/fiber';
 import {useRecoilState} from "recoil";
 import {currentVertexAtom, drawingAtom, polygonsAtom} from "../../helpers/atom";
 import {DynamicPolygon, isCloseToFirstVertex} from "../3dComponents/DynamicPolygon";
+import {produce} from "immer";
+import {throttle} from "lodash/function";
 
 export default function DynamicDrawing() {
     const [polygons, setPolygons] = useRecoilState(polygonsAtom);
@@ -14,37 +16,41 @@ export default function DynamicDrawing() {
     const planeRef = useRef();
 
     useEffect(() => {
-        const handleMouseMove = (event) => {
-            if (selectedVertex) {
-                // Calculate mouse position in normalized device coordinates (-1 to +1) for both components
-                pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-                pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        const handleMouseMove = throttle((event) => {
+            if (!selectedVertex) return; // Early return to avoid unnecessary computations
+
+            // Calculate mouse position in normalized device coordinates (-1 to +1) for both components
+            const x = (event.clientX / window.innerWidth) * 2 - 1;
+            const y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            // Update only if necessary to minimize setting values
+            if (pointer.x !== x || pointer.y !== y) {
+                pointer.x = x;
+                pointer.y = y;
 
                 // Update the picking ray with the camera and mouse position
                 raycaster.setFromCamera(pointer, camera);
 
-                // Calculate objects intersecting the picking ray. Assume 'planeRef' is a ref to a PlaneBufferGeometry
+                // Calculate objects intersecting the picking ray
                 const intersects = raycaster.intersectObject(planeRef.current);
 
                 if (intersects.length > 0) {
                     // The first intersection point is the new position in world coordinates
                     const point = intersects[0].point;
 
-                    setPolygons(poly => {
-                        let newPoly = JSON.parse(JSON.stringify(poly)); // Deep copy of the state
-                        newPoly[selectedVertex.polygonIndex][selectedVertex.vertexIndex] = point.toArray();
-                        return newPoly;
-                    })
+                    setPolygons(currentPolygons => produce(currentPolygons, draft => {
+                        draft[selectedVertex.polygonIndex][selectedVertex.vertexIndex] = point.toArray();
+                    }));
                 }
             }
-        }
+        }, 10)
 
         window.addEventListener('mousemove', handleMouseMove);
 
         return () => {
             window.removeEventListener('mousemove', handleMouseMove);
         };
-    }, [selectedVertex,camera,pointer,raycaster,setPolygons]);
+    }, [selectedVertex, camera, pointer, raycaster, setPolygons]);
 
     useEffect(() => {
         const handleMouseUp = () => {
