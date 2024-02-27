@@ -24,7 +24,7 @@ export function DynamicPolygon({vertices, tempVertex, polygonIndex}) {
         }
 
         return transformedVertices;
-    }, [vertices, tempVertex, isDrawing]); // Depend on vertices and tempVertex
+    }, [vertices, tempVertex]); // Depend on vertices and tempVertex
 
     useFrame(() => {
         if (lineRef.current) {
