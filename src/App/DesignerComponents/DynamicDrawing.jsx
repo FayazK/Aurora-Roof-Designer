@@ -65,12 +65,14 @@ export default function DynamicDrawing() {
 
     const updateTempVertex = useCallback(() => {
         raycaster.setFromCamera(pointer, camera);
-        const intersects = raycaster.intersectObject(planeRef.current);
-        if (intersects.length > 0) {
-            const point = intersects[0].point;
-            setTempVertex([point.x, point.y, point.z]);
+        if (planeRef.current) {
+            const intersects = raycaster.intersectObject(planeRef.current);
+            if (intersects.length > 0) {
+                const point = intersects[0].point;
+                setTempVertex([point.x, point.y, point.z]);
+            }
         }
-    }, [pointer, camera, raycaster]);// updateTempVertex
+    }, [pointer, camera, raycaster]);
 
     const commitPolygon = useCallback(() => {
         if (tempPoly.length > 0) {
