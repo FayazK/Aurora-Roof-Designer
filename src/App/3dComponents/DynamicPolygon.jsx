@@ -1,4 +1,4 @@
-import {useRef, useMemo} from "react";
+import {useRef, useMemo, Fragment} from "react";
 import {useFrame} from "@react-three/fiber";
 import {Vector3} from "three";
 import {Text} from "@react-three/drei";
@@ -61,7 +61,7 @@ export const DynamicPolygon = ({vertices, tempVertex, polygonIndex}) => {
             const midpoint = [(vertex[0] + nextVertex[0]) / 2, (vertex[1] + nextVertex[1]) / 2, (vertex[2] + nextVertex[2]) / 2]; // Calculate the midpoint
             const distance = calculateDistance(vertex, nextVertex); // Calculate the distance
 
-            return (<>
+            return (<Fragment key={'f-'+idx}>
                 <mesh
                     key={idx}
                     position={new Vector3(...vertex)}
@@ -73,7 +73,7 @@ export const DynamicPolygon = ({vertices, tempVertex, polygonIndex}) => {
                 <Text position={midpoint} fontSize={0.1}>
                     {distance.toFixed(2)}
                 </Text>
-            </>);
+            </Fragment>);
         })}
         {tempVertex && (<mesh position={new Vector3(...tempVertex)}>
             <sphereGeometry args={[0.03, 32, 32]}/>

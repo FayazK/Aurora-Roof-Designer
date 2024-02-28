@@ -4,7 +4,6 @@ import {useRecoilState} from "recoil";
 import {currentVertexAtom, drawingAtom, polygonsAtom} from "../../helpers/atom";
 import {DynamicPolygon} from "../3dComponents/DynamicPolygon";
 import {produce} from "immer";
-import {throttle} from "lodash/function";
 import {isCloseToFirstVertex} from "./CanvasComponents";
 
 export default function DynamicDrawing() {
