@@ -2,7 +2,7 @@ import React, {useRef, useState, useEffect, useCallback} from 'react';
 import {useThree} from '@react-three/fiber';
 import {useRecoilState} from "recoil";
 import {currentVertexAtom, drawingAtom, polygonsAtom} from "../../helpers/atom";
-import {DynamicPolygon} from "../3dComponents/DynamicPolygon";
+import {DynamicPolygon} from "./DynamicPolygon";
 import {produce} from "immer";
 import {isCloseToFirstVertex} from "./CanvasComponents";
 

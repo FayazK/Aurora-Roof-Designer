@@ -7,9 +7,10 @@ import {MapTile} from "./DesignerComponents/MapTile";
 
 
 export default function Designer() {
+
     return (<Canvas camera={cameraProps} gl={glProps}>
         <DynamicDrawing/>
-        <MapTile imageUrl={'staticmap.png'} />
+        <MapTile imageUrl={'staticmap.png'}/>
         <SceneLighting/>
     </Canvas>)
 }// Designer
