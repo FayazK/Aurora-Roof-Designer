@@ -1,6 +1,6 @@
 import {PlaneGeometry, TextureLoader} from "three";
-import React, {useMemo} from "react";
 import {useLoader} from "@react-three/fiber";
+import {useMemo} from "react";
 
 export const MapTile = ({imageUrl}) => {
     const texture = useLoader(TextureLoader, imageUrl);

@@ -1,6 +1,5 @@
-// Define a separate component for lighting to improve readability and reusability
-import {memo} from "react";
 import {Vector3} from "three";
+import {memo} from "react";
 
 export const SceneLighting = memo(() => (
     <>

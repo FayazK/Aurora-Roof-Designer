@@ -1,10 +1,8 @@
-import '../assets/css/App.css';
+import './assets/App.css'
 import {Button, Layout, theme} from "antd";
-import Designer from "./Designer";
 import {useRecoilState} from "recoil";
-import {drawingAtom} from "../helpers/atom";
-
-
+import {drawingAtom} from "./helpers/atoms.js";
+import Designer from "./Components/Designer.jsx";
 const {Header, Content} = Layout;
 
 function App() {
@@ -16,7 +14,7 @@ function App() {
     }
 
     return (<Layout>
-        <Header className={'header'} style={{backgroundColor:colorBgContainer}}>
+        <Header className={'header'} style={{backgroundColor: colorBgContainer}}>
             <Button onClick={handleDrawing}>{isDrawing ? 'Stop Drawing' : 'Start Drawing'}</Button>
         </Header>
         <Content style={{height: 'calc(100vh - 60px)'}}>
@@ -25,4 +23,4 @@ function App() {
     </Layout>);
 }
 
-export default App;
+export default App

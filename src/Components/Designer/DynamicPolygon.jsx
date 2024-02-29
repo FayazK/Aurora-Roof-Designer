@@ -2,11 +2,10 @@ import {useRef, useMemo, Fragment} from "react";
 import {useFrame} from "@react-three/fiber";
 import {Vector3} from "three";
 import {Text} from "@react-three/drei";
-
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {currentVertexAtom, drawingAtom} from "../../helpers/atom";
-import {calculateDistance} from "../../helpers/Formulas";
 import {useDrag} from "react-use-gesture";
+import {currentVertexAtom, drawingAtom} from "../../helpers/atoms.js";
+import {calculateDistance} from "../../helpers/Formulas.js";
 
 export const DynamicPolygon = ({vertices, tempVertex, polygonIndex}) => {
     const lineRef = useRef();
