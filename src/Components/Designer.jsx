@@ -1,15 +1,13 @@
-import {Canvas} from '@react-three/fiber';
-import DynamicDrawing from "./Designer/DynamicDrawing.jsx";
-import {MapTile} from "./Designer/MapTile.jsx";
-import {SceneLighting} from "./Designer/CanvasComponents.jsx";
-import {cameraProps, glProps} from "../helpers/global_props.js";
+import {Suspense} from "react";
+import {Card} from "antd";
+import GoogleMapWithThree from "./GoogleMaps/GoogleMapWithThree.jsx";
 
 
 export default function Designer() {
 
-    return (<Canvas camera={cameraProps} gl={glProps}>
-        <DynamicDrawing/>
-        <MapTile imageUrl={'staticmap.png'}/>
-        <SceneLighting/>
-    </Canvas>)
+    return (<div style={{width: '100vw', height: 'calc(100vh - 60px)'}}>
+        <Suspense fallback={<Card>Loading 3D Content...</Card>}>
+            <GoogleMapWithThree/>
+        </Suspense>
+    </div>)
 }// Designer
