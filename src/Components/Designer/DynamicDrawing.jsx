@@ -20,8 +20,8 @@ export default function DynamicDrawing() {
         }
         const {polygonIndex, vertexIndex, x, y} = selectedVertex;
         // Calculate mouse position in normalized device coordinates (-1 to +1) for both components
-        const canvasX = (x / window.innerWidth) * 2 - 1;
-        const canvasY = -(y / (window.innerHeight+40)) * 2+1;
+        const canvasX = (x / gl.domElement.width) * 2 - 1;
+        const canvasY = -(y / (gl.domElement.height + 120)) * 2 + 1;
 
         // Update only if necessary to minimize setting values
         if (pointer.x !== canvasX || pointer.y !== canvasY) {
