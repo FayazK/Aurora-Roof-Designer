@@ -85,6 +85,7 @@ export default function DynamicDrawing() {
 
     useEffect(() => {
         const canvas = gl.domElement;
+        console.log(isDrawing)
 
         if (isDrawing) {
             canvas.addEventListener('mousemove', updateTempVertex);

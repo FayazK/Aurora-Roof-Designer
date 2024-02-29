@@ -22,5 +22,5 @@ export const googleMapAtom = atom({
 });
 
 export const mapCenterAtom = atom({
-    default: null, key: 'mapCenterAtom'
+    default: {lat: 37.46697106434549, lng: -122.21422606806213}, key: 'mapCenterAtom'
 })

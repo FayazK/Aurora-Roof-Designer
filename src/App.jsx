@@ -11,7 +11,7 @@ function App() {
 
     const handleDrawing = () => {
         setIsDrawing(!isDrawing);
-    }
+    }// handleDrawing
 
     return (<Layout>
         <Header className={'header'} style={{backgroundColor: colorBgContainer}}>
