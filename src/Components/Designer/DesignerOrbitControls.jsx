@@ -1,8 +1,7 @@
-import {OrbitControls} from "@react-three/drei";
-import {useThree} from "@react-three/fiber";
+import {OrbitControls, OrthographicCamera} from "@react-three/drei";
 import {memo} from "react";
 
-export const DesignerOrbitControls = memo(() => {
-    const {camera} = useThree(); // Access the camera
-    return <OrbitControls camera={camera}/>
-})
+export const DesignerOrbitControls = ()=>{
+    return <OrbitControls />
+    /*return <OrbitControls enableDamping={false} />*/
+}

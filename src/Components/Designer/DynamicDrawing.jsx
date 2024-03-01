@@ -98,7 +98,7 @@ export default function DynamicDrawing() {
               onPointerMove={isDrawing ? updateTempVertex : null}
               onPointerDown={isDrawing ? finalizeVertex : null}
         >
-            <planeGeometry args={[100, 100]}/>
+            <planeGeometry args={[10, 10]}/>
             <meshStandardMaterial color="black"/>
         </mesh>
         {polygons.map((vertices, index) => (
