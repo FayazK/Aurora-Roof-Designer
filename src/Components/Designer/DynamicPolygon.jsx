@@ -67,7 +67,7 @@ export const DynamicPolygon = ({vertices, tempVertex, polygonIndex}) => {
                     {...bind(vertex, idx)}
                 >
                     <sphereGeometry args={[0.05, 32, 32]}/>
-                    <meshBasicMaterial color="black"/>
+                    <meshBasicMaterial color="black" transparent={true} opacity={0.7}/>
                 </mesh>
                 <Text position={midpoint} fontSize={0.1} color={'black'}>
                     {distance.toFixed(2)}
