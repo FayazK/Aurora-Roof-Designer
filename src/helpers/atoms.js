@@ -21,7 +21,7 @@ const localStorageEffect = key => ({setSelf, onSet}) => {
 };
 
 export const polygonsAtom = atom({
-    key: 'polygonsAtom', default: [], effects_UNSTABLE: [localStorageEffect('polygons')]
+    key: 'polygonsAtom', default: [], /*effects_UNSTABLE: [localStorageEffect('polygons')]*/
 });
 
 export const polygonAreaSelector = selector({

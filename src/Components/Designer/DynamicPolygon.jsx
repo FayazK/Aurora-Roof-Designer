@@ -76,7 +76,7 @@ export const DynamicPolygon = ({vertices, tempVertex, polygonIndex}) => {
         })}
         {tempVertex && (<mesh position={new Vector3(...tempVertex)}>
             <sphereGeometry args={[0.05, 32, 32]}/>
-            <meshBasicMaterial color="black"/>
+            <meshBasicMaterial color="black" transparent={true} opacity={0.4} />
         </mesh>)}
     </group>);
 }
