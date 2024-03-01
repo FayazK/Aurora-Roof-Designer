@@ -60,7 +60,7 @@ export const DynamicPolygon = ({vertices, tempVertex, polygonIndex}) => {
             const midpoint = [(vertex[0] + nextVertex[0]) / 2, (vertex[1] + nextVertex[1]) / 2, (vertex[2] + nextVertex[2]) / 2]; // Calculate the midpoint
             const distance = calculateDistance(vertex, nextVertex); // Calculate the distance
 
-            return (<Fragment key={'f-'+idx}>
+            return (<Fragment key={'f-' + idx}>
                 <mesh
                     key={idx}
                     position={new Vector3(...vertex)}
@@ -81,10 +81,3 @@ export const DynamicPolygon = ({vertices, tempVertex, polygonIndex}) => {
     </group>);
 }
 
-export const isCloseToFirstVertex = (vertex, firstVertex) => {
-    if (!Array.isArray(vertex) || !Array.isArray(firstVertex)) {
-        return false;
-    }
-    const distance = new Vector3(...vertex).distanceToSquared(new Vector3(...firstVertex));
-    return distance < 0.1; // Use distanceToSquared to avoid the sqrt calculation, adjust sensitivity as needed
-}

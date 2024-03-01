@@ -3,7 +3,8 @@ import {useThree} from '@react-three/fiber';
 import {useRecoilState} from "recoil";
 import {produce} from "immer";
 import {currentVertexAtom, drawingAtom, polygonsAtom} from "../../helpers/atoms.js";
-import {DynamicPolygon, isCloseToFirstVertex} from "./DynamicPolygon.jsx";
+import {DynamicPolygon} from "./DynamicPolygon.jsx";
+import {isCloseToFirstVertex} from "./CanvasComponents.jsx";
 
 export default function DynamicDrawing() {
     const [polygons, setPolygons] = useRecoilState(polygonsAtom);
@@ -81,23 +82,6 @@ export default function DynamicDrawing() {
             setTimeout(() => setIsDrawing(false), 0);
         }
     }, [tempVertex, tempPoly, setIsDrawing]);
-
-
-    /*useEffect(() => {
-        const canvas = gl.domElement;
-
-        if (isDrawing) {
-            canvas.addEventListener('mousemove', updateTempVertex);
-            canvas.addEventListener('click', finalizeVertex);
-        } else {
-            commitPolygon();
-        }
-
-        return () => {
-            canvas.removeEventListener('mousemove', updateTempVertex);
-            canvas.removeEventListener('click', finalizeVertex);
-        };
-    }, [isDrawing, updateTempVertex, finalizeVertex, commitPolygon, gl.domElement]);*/
 
     // Effect to reset tempPoly and tempVertex when starting a new drawing
     useEffect(() => {
