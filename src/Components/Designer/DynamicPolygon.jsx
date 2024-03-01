@@ -66,17 +66,17 @@ export const DynamicPolygon = ({vertices, tempVertex, polygonIndex}) => {
                     position={new Vector3(...vertex)}
                     {...bind(vertex, idx)}
                 >
-                    <sphereGeometry args={[0.03, 32, 32]}/>
-                    <meshBasicMaterial color="white"/>
+                    <sphereGeometry args={[0.05, 32, 32]}/>
+                    <meshBasicMaterial color="black"/>
                 </mesh>
-                <Text position={midpoint} fontSize={0.1}>
+                <Text position={midpoint} fontSize={0.1} color={'black'}>
                     {distance.toFixed(2)}
                 </Text>
             </Fragment>);
         })}
         {tempVertex && (<mesh position={new Vector3(...tempVertex)}>
-            <sphereGeometry args={[0.03, 32, 32]}/>
-            <meshBasicMaterial color="white"/>
+            <sphereGeometry args={[0.05, 32, 32]}/>
+            <meshBasicMaterial color="black"/>
         </mesh>)}
     </group>);
 }
