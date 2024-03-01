@@ -1,4 +1,4 @@
-import React, {useRef, useState, useEffect, useCallback} from 'react';
+import {useRef, useState, useEffect, useCallback} from 'react';
 import {useThree} from '@react-three/fiber';
 import {useRecoilState} from "recoil";
 import {produce} from "immer";
@@ -83,7 +83,7 @@ export default function DynamicDrawing() {
     }, [tempVertex, tempPoly, setIsDrawing]);
 
 
-    useEffect(() => {
+    /*useEffect(() => {
         const canvas = gl.domElement;
 
         if (isDrawing) {
@@ -97,23 +97,28 @@ export default function DynamicDrawing() {
             canvas.removeEventListener('mousemove', updateTempVertex);
             canvas.removeEventListener('click', finalizeVertex);
         };
-    }, [isDrawing, updateTempVertex, finalizeVertex, commitPolygon, gl.domElement]);
+    }, [isDrawing, updateTempVertex, finalizeVertex, commitPolygon, gl.domElement]);*/
 
     // Effect to reset tempPoly and tempVertex when starting a new drawing
     useEffect(() => {
         if (!isDrawing) {
             setTempPoly([]);
             setTempVertex([]);
+            commitPolygon();
+            setSelectedVertex(null);
         }
     }, [isDrawing]);
 
     return (<>
-        <mesh ref={planeRef} position={[0, 0, 0]}>
+        <mesh ref={planeRef} position={[0, 0, 0]}
+              onPointerMove={isDrawing ? updateTempVertex : null}
+              onPointerDown={isDrawing ? finalizeVertex : null}
+        >
             <planeGeometry args={[100, 100]}/>
             <meshStandardMaterial color="black"/>
         </mesh>
         {polygons.map((vertices, index) => (
-            <DynamicPolygon key={'poly-'.index} polygonIndex={index} vertices={vertices}/>))}
+            <DynamicPolygon key={'poly-' + index} polygonIndex={index} vertices={vertices}/>))}
         {(isDrawing && tempPoly.length) &&
             <DynamicPolygon vertices={tempPoly} tempVertex={tempVertex} key={`tmp-vertex`}/>}
     </>);
