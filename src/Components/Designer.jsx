@@ -9,12 +9,20 @@ import {OrbitControls, OrthographicCamera} from "@react-three/drei";
 
 export default function Designer() {
 
-    return (<Canvas camera={cameraProps} gl={glProps}>
-        <OrthographicCamera>
-            <DynamicDrawing/>
-            <MapTile imageUrl={'staticmap.png'}/>
-            <SceneLighting/>
-            <DesignerOrbitControls/>
-        </OrthographicCamera>
-    </Canvas>)
+    return (<>
+        <Canvas camera={cameraProps} gl={glProps}>
+            <OrthographicCamera>
+                <DynamicDrawing/>
+                <MapTile imageUrl={'staticmap.png'}/>
+                <SceneLighting/>
+
+                <OrbitControls
+                    minPolarAngle={Math.PI / 2} // Restrict top view
+                    minAzimuthAngle={0} // Disable tilting to the left
+                    maxAzimuthAngle={0} // Disable tilting to the right
+                />
+            </OrthographicCamera>
+        </Canvas>
+        <DesignerOrbitControls/>
+    </>)
 }// Designer
