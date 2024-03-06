@@ -1,8 +1,8 @@
 import {useRef, useState, useEffect, useCallback} from 'react';
 import {useThree} from '@react-three/fiber';
-import {useRecoilState} from "recoil";
+import {useRecoilState, useSetRecoilState} from "recoil";
 import {produce} from "immer";
-import {currentVertexAtom, drawingAtom, polygonsAtom} from "../../helpers/atoms.js";
+import {currentVertexAtom, drawingAtom, polygonsAtom, topViewAtom} from "../../helpers/atoms.js";
 import {DynamicPolygon} from "./DynamicPolygon.jsx";
 import {isCloseToFirstVertex} from "./CanvasComponents.jsx";
 
@@ -14,6 +14,7 @@ export default function DynamicDrawing() {
     const [selectedVertex, setSelectedVertex] = useRecoilState(currentVertexAtom);
     const {pointer, camera, raycaster, gl} = useThree();
     const planeRef = useRef();
+    const setTopView = useSetRecoilState(topViewAtom);
 
     useEffect(() => {
         if (!selectedVertex) {
@@ -85,6 +86,7 @@ export default function DynamicDrawing() {
 
     // Effect to reset tempPoly and tempVertex when starting a new drawing
     useEffect(() => {
+        setTopView(isDrawing);
         if (!isDrawing) {
             setTempPoly([]);
             setTempVertex([]);

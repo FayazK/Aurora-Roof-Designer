@@ -4,6 +4,10 @@ export const drawingAtom = atom({
     default: false, key: 'drawingAtom'
 })
 
+export const topViewAtom = atom({
+    default: false, key: 'topViewAtom'
+});
+
 export const currentVertexAtom = atom({
     default: null, key: 'currentVertexAtom'
 });
