@@ -21,7 +21,6 @@ export default function Designer() {
                 top={window.innerHeight / 2}
                 bottom={window.innerHeight / -2}
             />
-            <SceneLighting/>
             <DynamicDrawing/>
             <MapTile imageUrl={'staticmap.png'}/>
             <ViewController />
